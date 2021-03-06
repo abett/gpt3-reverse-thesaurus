@@ -163,7 +163,7 @@ const displayThesaurusHelper = (targetEl) => {
   helperInputEl.placeholder = "explain the word you're looking for";
   helperInputEl.addEventListener('input', unlockButton, false);
   helperInputEl.addEventListener('keyup', (e) => {
-    if (e.key === "Escape") window.close();
+    if (e.key === "Escape") removeThesaurusHelper();
     if (e.key === "Enter") getSuggestions();
   }, false);
 
