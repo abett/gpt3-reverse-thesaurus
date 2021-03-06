@@ -1,0 +1,70 @@
+.thesaurus-anchor {
+}
+
+#thesaurus-helper {
+  z-index: 99999;
+  background: #1e2330;
+  color: white;
+  border: #f8c91c 3px solid;
+  border-radius: 8px;
+  padding: 4px 6px;
+}
+
+#thesaurus-helper a#close-thesaurus-helper {
+  position: absolute;
+  color: #f8c91c;
+  font-weight: bold;
+  top: 0;
+  right: 0;
+  margin-right: 3px;
+}
+
+#thesaurus-helper .request-wrapper {
+  position: relative;
+  width: 450px;
+  height: 32px;
+  margin: 2px;
+  padding: 5px;
+  display: grid;
+  grid-template-rows: 2em;
+  grid-template-columns: 1fr auto;
+}
+
+#thesaurus-helper .request-wrapper input {
+  grid-column: 1;
+  height: 100%;
+  padding: 4px 6px;
+  margin: 2px;
+}
+
+#thesaurus-helper .request-wrapper button {
+  grid-column: 2;
+  height: 100%;
+  margin: 2px 2px;
+  padding: 4px;
+  font-size: large;
+}
+
+#thesaurus-helper #thesaurus-suggestions.result-wrapper {
+  position: relative;
+  margin: 2px;
+  padding: 5px;
+}
+
+#thesaurus-helper #thesaurus-suggestions.result-wrapper ul#thesaurus-suggestion-list {
+  margin: 0;
+  padding: 2px;
+  font-size: large;
+}
+
+#thesaurus-helper #thesaurus-suggestions.result-wrapper li.thesaurus-suggestion {
+  list-style-type: none; /* Remove bullets */
+  cursor: pointer;
+  margin: 2px;
+  padding: 2px;
+}
+
+#thesaurus-helper #thesaurus-suggestions.result-wrapper li.thesaurus-suggestion:hover {
+  background: #f8c91c;
+  color: #1e2330;
+}

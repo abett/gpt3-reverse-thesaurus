@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "GPT3 Test",
+  "options_page": "options.html",
+  "background": {
+    "page": "background.html"
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon_64.png"
+  },
+  "icons": {
+    "128": "icon_128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
+      "js": ["contentScript.bundle.js"],
+      "css": ["content.styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions" : [
+    "tabs", "webNavigation",
+    "topSites", "storage",
+    "alarms", "notifications"
+  ],
+  "web_accessible_resources": [
+    "content.styles.css"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
