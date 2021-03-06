@@ -1,0 +1,51 @@
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  background: #1e2330;
+  color: #f8c91c;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+#settings-wrapper {
+  align-self: start;
+  justify-self: center;
+  margin: 25px;
+  padding: 25px;
+}
+
+#settings-wrapper h1,
+#settings-wrapper h2,
+#settings-wrapper h3 {
+  text-align: center;
+}
+
+#settings-wrapper .settings-row {
+  font-size: large;
+}
+
+#settings-wrapper input#api-key-input {
+  width: 400px;
+  padding: 7px;
+  margin: 4px;
+  background: #1e2330;
+  color: #f8c91c;
+  border: #f8c91c 2px solid;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+#settings-wrapper input::placeholder, /* Chrome, Firefox, Opera, Safari 10.1+ */
+#settings-wrapper input::-webkit-input-placeholder {
+  color: #ffffffb3;
+}
+
+
+#settings-wrapper input#api-key-input:focus{
+  outline: none;
+  /* reduce border width by 1 and increase padding */
+  border-width: 1px;
+  padding: 8px;
+}

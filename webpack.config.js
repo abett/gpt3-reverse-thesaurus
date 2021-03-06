@@ -38,10 +38,9 @@ if (fileSystem.existsSync(secretsPath)) {
 var options = {
   mode: process.env.NODE_ENV || 'development',
   entry: {
-    newtab: path.join(__dirname, 'src', 'pages', 'newtab', 'index.js'),
-    welcome: path.join(__dirname, 'src', 'pages', 'welcome', 'index.js'),
+    // newtab: path.join(__dirname, 'src', 'pages', 'newtab', 'index.js'),
     options: path.join(__dirname, 'src', 'pages', 'options', 'index.js'),
-    popup: path.join(__dirname, 'src', 'pages', 'popup', 'index.js'),
+    // popup: path.join(__dirname, 'src', 'pages', 'popup', 'index.js'),
     background: path.join(__dirname, 'src', 'pages', 'background', 'index.js'),
     contentScript: path.join(__dirname, 'src', 'content_scripts', 'generic_content_script', 'index.js'),
   },
@@ -148,30 +147,24 @@ var options = {
         },
       ],
     }),
-    new HtmlWebpackPlugin({
+    /* new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'newtab', 'index.html'),
       filename: 'newtab.html',
       chunks: ['newtab'],
       cache: false,
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src', 'pages', 'welcome', 'index.html'),
-      filename: 'welcome.html',
-      chunks: ['welcome'],
-      cache: false,
-    }),
+    }), */
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'options', 'index.html'),
       filename: 'options.html',
       chunks: ['options'],
       cache: false,
     }),
-    new HtmlWebpackPlugin({
+    /* new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'popup', 'index.html'),
       filename: 'popup.html',
       chunks: ['popup'],
       cache: false,
-    }),
+    }), */
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'background', 'index.html'),
       filename: 'background.html',

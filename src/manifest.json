@@ -6,7 +6,6 @@
     "page": "background.html"
   },
   "browser_action": {
-    "default_popup": "popup.html",
     "default_icon": "icon_64.png"
   },
   "icons": {
@@ -21,12 +20,19 @@
     }
   ],
   "permissions" : [
-    "tabs", "webNavigation",
-    "topSites", "storage",
-    "alarms", "notifications"
+    "activeTab", "storage"
   ],
   "web_accessible_resources": [
     "content.styles.css"
   ],
+  "commands": {
+    "toggle-thesaurus-helper": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "linux": "Ctrl+Shift+U"
+      },
+      "description": "Open / Close the Reverse Thesaurus Helper"
+    }
+  },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
