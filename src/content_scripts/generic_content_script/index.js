@@ -3,20 +3,6 @@ import _ from 'lodash';
 import axios from 'axios';
 
 
-const openAiEngine = 'davinci';
-const openAiPrompt = 'A clever bot that finds the correct word.\r\n' +
-  '\r\n' +
-  'Q: when something or someone leaves somewhere abruptly\r\n' +
-  'A: absquatulate, abscond, bolt, decamp, depart, disappear.\r\n' +
-  'Q: like shrewd\r\nA: argute, astute, cagey, canny, crafty.\r\n' +
-  'Q: Acting in a rage or really hysterical\r\n' +
-  'A: conniption, blowup, fit, huff, outburst, scene, tantrum\r\n' +
-  'Q: When someone is reddening or blushing\r\n' +
-  'A: erubescent, blooming, cerise, crimson.\r\n' +
-  'Q: a mixture of horrible sounds\r\n' +
-  'A: cacophony, noise, discord, harsh.';
-
-
 let targetAnchorPosition;
 
 const insertSuggestion = (suggestion) => {
@@ -58,29 +44,29 @@ const getSuggestions = () => {
 
     // prepare axios client headers
     const gtp3Api = axios.create({
-      baseURL: 'https://api.openai.com/v1',
+      baseURL: 'https://1hpd1g.deta.dev/api/v1',
       headers: {
         'content-type' : 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_TOKEN}`
+        'Authorization': `Bearer ${process.env.API_TOKEN}`
       },
     });
 
-    const finalPrompt = openAiPrompt + '\r\nQ: ' + explanation + '\r\nA: ';
-
-    gtp3Api.post(`/engines/${openAiEngine}/completions`, {
-      prompt: finalPrompt,
-      max_tokens: 8,
+    gtp3Api.post(`/findwords/`, {
+      body: {
+        user_prompt: explanation,
+        input_language: 'en',
+        output_language: 'en',
+        tonality: 'friendly',
+        max_suggestions: 5,
+      }
     })
     .then(response => response.data)
-    .then(data => _.get(data, ['choices', 0, 'text']) )
-    .then(completion => {
-      completion = completion.replace(/^(\r|\n)+/, '');
-      const suggestions = completion
-      .split(/[, ]/)
-      .map(s => s.trim()) // trim whitespace
-      .filter(s => s.length > 2); // remove results of <= 2 characters length
+    .then(data => {
+      console.log(data);
+      if (!data) throw new Error('no-data');
 
-      if (!suggestions) throw new Error('no-suggestions');
+      const suggestions = _.get(data, 'suggestions', []);
+      if (!suggestions || suggestions.length === 0) throw new Error('no-suggestions');
 
       // first, disable the submit button again
       const submitButtonEl = document.getElementById('thesaurus-request-button');

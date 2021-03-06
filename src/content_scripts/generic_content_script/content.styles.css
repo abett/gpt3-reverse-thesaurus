@@ -9,13 +9,13 @@
   z-index: 99999;
   background: rgb(30 35 48 / 85%);
   color: #f8c91c;
-  padding: 25px;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 10fr 1fr;
 }
 
 #thesaurus-helper > div {
+  margin: 20px;
   padding: 20px;
 }
 
@@ -111,17 +111,20 @@
 
 
 #thesaurus-helper-footer {
+
+}
+
+#thesaurus-helper-footer > div {
+  width: 90%;
+  align-self: start;
+  justify-self: center;
+}
+
+#thesaurus-helper-footer p {
   background: #1e2330;
   padding: 10px 0;
   border-radius: 10px;
   color: #f8c91c;
   text-align: center;
-}
-
-#thesaurus-helper-footer > div {
-  width: 90%;
-}
-
-#thesaurus-helper-footer p {
   font-size: x-large;
 }
