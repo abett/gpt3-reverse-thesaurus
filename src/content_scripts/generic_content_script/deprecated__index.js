@@ -160,7 +160,7 @@ const displayThesaurusHelper = (targetEl) => {
   helperInputEl.type = 'text';
   helperInputEl.id = 'thesaurus-explanation-input';
   helperInputEl.name = 'thesaurus-explanation-input';
-  helperInputEl.placeholder = "explain the word you're looking for";
+  helperInputEl.placeholder = "Explain the word you're looking for with 15+ characters...";
   helperInputEl.addEventListener('input', unlockButton, false);
   helperInputEl.addEventListener('keyup', (e) => {
     if (e.key === "Escape") removeThesaurusHelper();

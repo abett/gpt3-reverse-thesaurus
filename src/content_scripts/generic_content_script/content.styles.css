@@ -7,7 +7,9 @@
   height: 100%;
   width: 100%;
   z-index: 99999;
-  background: rgb(30 35 48 / 85%);
+  backdrop-filter: blur(10px);
+  background-color: rgba(0,0,0,0.7);
+  padding-bottom: 15px !important;
   color: #f8c91c;
   display: grid;
   grid-template-columns: 1fr;
@@ -38,6 +40,8 @@
 
 #thesaurus-helper-body > div {
   width: 90%;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 #thesaurus-helper-body .request-wrapper {
@@ -45,18 +49,26 @@
   align-self: center;
   justify-self: center;
   display: flex;
+  border-radius: 25px !important;
+  webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 0.5px 0px solid rgba(255,255,255,0.15);
+  background-color: rgba(0,0,0,0.05)!important;
 }
 
 #thesaurus-helper-body .request-wrapper input {
   flex-grow: 1;
   height: 60px;
-  padding: 2px 15px;
   margin: 2px 5px;
-  font-size: xx-large;
-  background: #1e2330;
-  color: #f8c91c;
-  border: #f8c91c 5px solid;
-  border-radius: 20px;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background: none;
+  border: none;
+  color: #ffffff;
+  line-height:  24px;
   box-shadow: none;
 }
 
@@ -71,15 +83,15 @@
 }
 
 #thesaurus-helper-body .request-wrapper button {
-  height: 60px;
-  margin: 2px 5px;
+  height: auto;
+  margin: 5px;
   padding: 0 15px;
   background: #f8c91c;
   color: #1e2330;
   border: #f8c91c 1px solid;
   border-radius: 20px;
   font-weight: bold;
-  font-size: xx-large;
+  font-size: large;
   display: inline-block;
   line-height: 0;
 }
@@ -111,7 +123,7 @@
 
 
 #thesaurus-helper-footer {
-
+  display: none;
 }
 
 #thesaurus-helper-footer > div {
