@@ -38,6 +38,7 @@
   color: #f8c91c;
   font-size: x-large;
   font-weight: bold;
+  padding: 5px 10px;
 }
 
 #thesaurus-helper-language-select:after {
@@ -199,6 +200,8 @@
 
 #thesaurus-suggestion-list .thesaurus-suggestion:hover .thesaurus-suggestion-action-cta::after {
   content: attr(data-action);
+  color: #e91e63;
+  font-weight: bold;
 }
 
 
