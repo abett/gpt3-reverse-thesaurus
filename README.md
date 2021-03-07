@@ -21,8 +21,9 @@ You can bring the extension up one of three ways:
 
 1. Set the Language you want to describe and receive word-explanations in ("Input") and the language you want suggestions in ("Output")
 
-Just type away!
-(*The submit button unclocks once you've typed 15 characters*)
+2. Just type away!
+(*The submit button unlocks once you've typed 15 characters*)
+
 
 
 
@@ -36,10 +37,6 @@ $ npm run dev
 ```
 
 
-
-
-
-
 To run the dev mode into /build folder:
 
 ```
@@ -47,7 +44,7 @@ $ npm run dev
 ```
 
 
-To build the browser extension
+To build the browser extension (this will also build into /build)
 ```
 $ NODE_ENV=production npm run build
 ```
