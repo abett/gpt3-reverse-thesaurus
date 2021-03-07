@@ -29,6 +29,12 @@
   color: #f8c91c;
   font-size: x-large;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+#thesaurus-helper-language-switch label {
+  margin-right: 5px;
 }
 
 #thesaurus-helper-language-switch select {

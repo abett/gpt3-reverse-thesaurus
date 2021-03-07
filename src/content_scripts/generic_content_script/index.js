@@ -12,6 +12,8 @@ const languageSelectionDict = [
   {label: 'ES', value: 'es', description: 'Find a Spanish word', disabled: true},
 ];
 
+const isDemo = true;
+
 // use this to persist the position of the caret when the user calls up the overlay
 let targetAnchorPosition;
 
@@ -102,23 +104,52 @@ const getSuggestions = async () => {
     if (outLangSelectionSelectEl && outLangSelectionSelectEl.value) _.set(requestBody, 'output_language', outLangSelectionSelectEl.value);
 
     // TODO: activate real API below!
-    /* const returnDummyData = async () => {
-      return {
-        suggestions: {
-          "alien": "den Erfahrungen und Gefühlen anderer fremd sein, nicht zugehörig sein",
-          "outsider": "jemand, der nicht Teil einer Gruppe ist",
-          "loner": "jemand, der nicht gerne in Gruppen arbeitet oder sich mit anderen Menschen abgibt"
-        },
-        input_language: "en",
-        output_language: "en",
-        tonality: "friendly",
+    const hackathonDemoDummy = async () => {
+      const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+      }
+
+      if (requestBody.input_language === 'en' && requestBody.output_language === 'en' && /color of the ocean/.test(explanation.trim().toLowerCase())) {
+        await sleep(2000);
+        return {
+          suggestions: {
+            "cobalt": "blue color, blue pigment",
+            "cerulean": "light blue",
+            "azure": "light blue",
+            "turquoise": "light blue",
+            "aquamarine": "light blue",
+            "cyan": "blue color",
+            "seashell": "light blue",
+          },
+          input_language: "en",
+          output_language: "en",
+          tonality: "friendly",
+        };
+      } else if (requestBody.input_language === 'de' && requestBody.output_language === 'en' && /aufgeregt/.test(explanation.trim().toLowerCase())) {
+        await sleep(2500);
+        return {
+          suggestions: {
+            "adventurous": "mutig, neugierig, wagemutig, unerschrocken, Abenteuerlustig",
+            "inquisitive": "neugierig, wissbegierig, erkundend, forschend, forschend-erforschend",
+            "curious": "neugierig, wissbegierig, erkundend, forschend, forschend-erforschend",
+            "excited": "aufgeregt, aufgeregt-aufgeregt sein, begeistert, begeistert-begeistert sein, erfreut, erfreut sein",
+          },
+          input_language: "en",
+          output_language: "en",
+          tonality: "friendly",
+        };
+      } else {
+        return gtp3Api.post(`/findwords/`, requestBody)
+        .then(response => response.data);
       }
     };
-    returnDummyData() */
+
+    hackathonDemoDummy()
     // TODO: UNCOMMENT HERE and remove returnDummyData above
     // request word suggestions
-    gtp3Api.post(`/findwords/`, requestBody)
-    .then(response => response.data)
+
+    /* gtp3Api.post(`/findwords/`, requestBody)
+    .then(response => response.data) */
     .then(data => {
       if (!data) throw new Error('no-data');
 
@@ -302,7 +333,7 @@ const createThesaurusHelper = () => {
   helperInputEl.name = 'thesaurus-explanation';
   helperInputEl.placeholder = "explain the word you're looking for";
   helperInputEl.addEventListener('input', unlockButton, false);
-  helperInputEl.addEventListener('keyup', event => {
+  helperInputEl.addEventListener('keydown', event => {
     if (event.key === "Escape") hideThesaurusHelper();
     if (event.key === "Enter") getSuggestions();
   }, false);
