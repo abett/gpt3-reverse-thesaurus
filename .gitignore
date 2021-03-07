@@ -8,7 +8,6 @@
 
 # production
 /build
-reverse-thesaurus.zip
 
 # misc
 .DS_Store

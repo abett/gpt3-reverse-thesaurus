@@ -12,8 +12,6 @@ const languageSelectionDict = [
   {label: 'ES', value: 'es', description: 'Find a Spanish word', disabled: true},
 ];
 
-const isDemo = true;
-
 // use this to persist the position of the caret when the user calls up the overlay
 let targetAnchorPosition;
 
@@ -27,7 +25,7 @@ const handleSuggestionSelect = async (event) => {
   if (target) {
     try {
       if (targetAnchorPosition) {
-        target.value = target.value.slice(0,targetAnchorPosition).replace(/\?\?\?$/, '') + suggestion + target.value.slice(targetAnchorPosition+1);
+        target.value = target.value.slice(0,targetAnchorPosition).replace(/\?\?\?$/, '') + suggestion + ' ' + target.value.slice(targetAnchorPosition);
       } else {
         target.value += suggestion;
       }
@@ -62,7 +60,7 @@ const getSuggestions = async () => {
   if (!helperInputEl) return;
 
   const explanation = (helperInputEl.value || '').trim();
-  if (explanation && explanation.length > 15) {
+  if (explanation && explanation.length > 5) {
 
     // first, disable the input, submit button and display a spinner
     helperInputEl.disabled = true;
@@ -103,53 +101,10 @@ const getSuggestions = async () => {
     if (inLangSelectionSelectEl && inLangSelectionSelectEl.value) _.set(requestBody, 'input_language', inLangSelectionSelectEl.value);
     if (outLangSelectionSelectEl && outLangSelectionSelectEl.value) _.set(requestBody, 'output_language', outLangSelectionSelectEl.value);
 
-    // TODO: activate real API below!
-    const hackathonDemoDummy = async () => {
-      const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
-      }
 
-      if (requestBody.input_language === 'en' && requestBody.output_language === 'en' && /color of the ocean/.test(explanation.trim().toLowerCase())) {
-        await sleep(2000);
-        return {
-          suggestions: {
-            "cobalt": "blue color, blue pigment",
-            "cerulean": "light blue",
-            "azure": "light blue",
-            "turquoise": "light blue",
-            "aquamarine": "light blue",
-            "cyan": "blue color",
-            "seashell": "light blue",
-          },
-          input_language: "en",
-          output_language: "en",
-          tonality: "friendly",
-        };
-      } else if (requestBody.input_language === 'de' && requestBody.output_language === 'en' && /aufgeregt/.test(explanation.trim().toLowerCase())) {
-        await sleep(2500);
-        return {
-          suggestions: {
-            "adventurous": "mutig, neugierig, wagemutig, unerschrocken, Abenteuerlustig",
-            "inquisitive": "neugierig, wissbegierig, erkundend, forschend, forschend-erforschend",
-            "curious": "neugierig, wissbegierig, erkundend, forschend, forschend-erforschend",
-            "excited": "aufgeregt, aufgeregt-aufgeregt sein, begeistert, begeistert-begeistert sein, erfreut, erfreut sein",
-          },
-          input_language: "en",
-          output_language: "en",
-          tonality: "friendly",
-        };
-      } else {
-        return gtp3Api.post(`/findwords/`, requestBody)
-        .then(response => response.data);
-      }
-    };
-
-    hackathonDemoDummy()
-    // TODO: UNCOMMENT HERE and remove returnDummyData above
     // request word suggestions
-
-    /* gtp3Api.post(`/findwords/`, requestBody)
-    .then(response => response.data) */
+    gtp3Api.post(`/findwords/`, requestBody)
+    .then(response => response.data)
     .then(data => {
       if (!data) throw new Error('no-data');
 
@@ -229,9 +184,9 @@ const unlockButton = (event) => {
   const submitButtonEl = document.getElementById('thesaurus-request-button');
   if (!helperInputEl || !submitButtonEl) return;
 
-  if (helperInputEl.value.length > 15 && submitButtonEl.disabled) {
+  if (helperInputEl.value.length > 5 && submitButtonEl.disabled) {
     submitButtonEl.disabled = false;
-  } else if (helperInputEl.value.length <= 15) {
+  } else if (helperInputEl.value.length <= 5) {
     submitButtonEl.disabled = true;
   }
 }
