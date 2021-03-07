@@ -207,22 +207,29 @@
 
 
 #thesaurus-helper-footer {
-  display: none;
   margin: 20px;
   padding: 20px;
+  display: flex;
 }
 
 #thesaurus-helper-footer > div {
-  width: 90%;
-  align-self: start;
-  justify-self: center;
+  margin-left: auto;
 }
 
-#thesaurus-helper-footer p {
-  background: #1e2330;
-  padding: 10px 0;
-  border-radius: 10px;
-  color: #f8c91c;
-  text-align: center;
-  font-size: x-large;
+#thesaurus-helper-footer p.team-note {
+  text-align: right;
+  color: #efc31f;
+  font-size: small;
+}
+
+#thesaurus-helper-footer a {
+  color: white;
+}
+
+#thesaurus-helper-footer p.team-note span.team-name::before {
+  content: "Team 'Sort of Languagish'"
+}
+#thesaurus-helper-footer p.team-note:hover span.team-name::before {
+  color: #e91e63;
+  content: "Jerome, David, Lukas and Alex"
 }

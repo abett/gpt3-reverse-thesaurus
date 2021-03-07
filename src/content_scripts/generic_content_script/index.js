@@ -305,7 +305,10 @@ const createThesaurusHelper = () => {
   // create a footer row
   const footerEl = document.createElement('div');
   footerEl.id = 'thesaurus-helper-footer';
-  footerEl.innerHTML = "<div><p>Please enter a description of the word you're trying to find (>15 characters)</p></div>";
+  footerEl.innerHTML = '<div><p class="team-note">' +
+    'Created with ❤️ & <a href="https://openai.com/blog/openai-api/">Skynet</a> by <span class="team-name" /><br/>' +
+    '(submission to the <a href="https://www.meetup.com/Natural-Language-Processing-Understanding-NLP-NLU/events/276054436/">GPT3 Hackathon</a> organized by <a href="https://www.meetup.com/Natural-Language-Processing-Understanding-NLP-NLU/">NLP Munich</a> Meetup group)' +
+    '</p></div>';
 
   // put it all together
   helperEl.appendChild(headerEl);
