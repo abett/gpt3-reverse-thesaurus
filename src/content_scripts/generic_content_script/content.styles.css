@@ -31,25 +31,26 @@
   font-weight: bold;
 }
 
-#thesaurus-helper-language-select {
+#thesaurus-helper-language-switch select {
   background: #4c4c4c;
   border: 2px solid #f8c91c;
   border-radius: 4px;
   color: #f8c91c;
   font-size: x-large;
   font-weight: bold;
+  margin-right: 15px;
   padding: 5px 10px;
 }
 
-#thesaurus-helper-language-select:after {
+#thesaurus-helper-language-switch select:after {
   color: #f8c91c;
 }
 
-#thesaurus-helper-language-select > option {
+#thesaurus-helper-language-switch select > option {
   background: #4c4c4c;
   color: #f8c91c;
 }
-#thesaurus-helper-language-select > option:disabled {
+#thesaurus-helper-language-switch select > option:disabled {
   background: #4c4c4c;
   color: lightgray;
 }

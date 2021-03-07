@@ -84,7 +84,7 @@ const getSuggestions = async () => {
       baseURL: 'https://1hpd1g.deta.dev/api/v1',
       headers: {
         'content-type' : 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        // 'Authorization': `Bearer ${apiKey}`
       },
     });
 
@@ -96,12 +96,13 @@ const getSuggestions = async () => {
       max_suggestions: 5,
     }
 
-    const languageSelectionSelectEl = document.getElementById('thesaurus-helper-language-select');
-    if (languageSelectionSelectEl && languageSelectionSelectEl.value) _.set(requestBody, 'output_language', languageSelectionSelectEl.value);
-
+    const inLangSelectionSelectEl = document.getElementById('thesaurus-helper-language-in-select');
+    const outLangSelectionSelectEl = document.getElementById('thesaurus-helper-language-out-select');
+    if (inLangSelectionSelectEl && inLangSelectionSelectEl.value) _.set(requestBody, 'input_language', inLangSelectionSelectEl.value);
+    if (outLangSelectionSelectEl && outLangSelectionSelectEl.value) _.set(requestBody, 'output_language', outLangSelectionSelectEl.value);
 
     // TODO: activate real API below!
-    const returnDummyData = async () => {
+    /* const returnDummyData = async () => {
       return {
         suggestions: {
           "alien": "den Erfahrungen und Gefühlen anderer fremd sein, nicht zugehörig sein",
@@ -113,12 +114,11 @@ const getSuggestions = async () => {
         tonality: "friendly",
       }
     };
-    returnDummyData()
-    /* TODO: UNCOMMENT HERE and remove returnDummyData above
+    returnDummyData() */
+    // TODO: UNCOMMENT HERE and remove returnDummyData above
     // request word suggestions
     gtp3Api.post(`/findwords/`, requestBody)
     .then(response => response.data)
-    */
     .then(data => {
       if (!data) throw new Error('no-data');
 
@@ -218,30 +218,56 @@ const createThesaurusHelper = () => {
   const languageSelectionEl = document.createElement('div');
   languageSelectionEl.id = 'thesaurus-helper-language-switch';
 
-  const languageSelectionLabelEl = document.createElement('label');
-  languageSelectionLabelEl.for = 'thesaurus-helper-language-select';
-  languageSelectionLabelEl.textContent = 'Language';
-  languageSelectionLabelEl.style.display = 'none';
+  const inLanguageSelectionLabelEl = document.createElement('label');
+  inLanguageSelectionLabelEl.for = 'thesaurus-helper-language-in-select';
+  inLanguageSelectionLabelEl.textContent = 'Input: ';
+  // inLanguageSelectionLabelEl.style.display = 'none';
 
-  const languageSelectionSelectEl = document.createElement('select');
-  languageSelectionSelectEl.id = 'thesaurus-helper-language-select';
-  languageSelectionSelectEl.name = 'thesaurus-helper-language';
+  const inLanguageSelectionSelectEl = document.createElement('select');
+  inLanguageSelectionSelectEl.id = 'thesaurus-helper-language-in-select';
+  inLanguageSelectionSelectEl.name = 'thesaurus-helper-language';
 
   languageSelectionDict.forEach(lang => {
-    const languageSelectionOptionEl = document.createElement('option');
-    languageSelectionOptionEl.value = lang.value;
-    languageSelectionOptionEl.textContent = lang.label;
-    languageSelectionOptionEl.disabled = lang.disabled
-    languageSelectionOptionEl.title = lang.description;
-    languageSelectionSelectEl.appendChild(languageSelectionOptionEl);
+    const inLanguageSelectionOptionEl = document.createElement('option');
+    inLanguageSelectionOptionEl.value = lang.value;
+    inLanguageSelectionOptionEl.textContent = lang.label;
+    inLanguageSelectionOptionEl.disabled = lang.disabled
+    inLanguageSelectionOptionEl.title = lang.description;
+    inLanguageSelectionSelectEl.appendChild(inLanguageSelectionOptionEl);
   });
-  languageSelectionSelectEl.addEventListener('select', e => {
+  inLanguageSelectionSelectEl.addEventListener('select', e => {
     e.preventDefault();
     // console.log(e);
   });
 
-  languageSelectionEl.appendChild(languageSelectionLabelEl);
-  languageSelectionEl.appendChild(languageSelectionSelectEl);
+
+  const outLanguageSelectionLabelEl = document.createElement('label');
+  outLanguageSelectionLabelEl.for = 'thesaurus-helper-language-out-select';
+  outLanguageSelectionLabelEl.textContent = 'Output: ';
+  // languageSelectionLabelEl.style.display = 'none';
+
+  const outLanguageSelectionSelectEl = document.createElement('select');
+  outLanguageSelectionSelectEl.id = 'thesaurus-helper-language-out-select';
+  outLanguageSelectionSelectEl.name = 'thesaurus-helper-language';
+
+  languageSelectionDict.forEach(lang => {
+    const outLanguageSelectionDict = document.createElement('option');
+    outLanguageSelectionDict.value = lang.value;
+    outLanguageSelectionDict.textContent = lang.label;
+    outLanguageSelectionDict.disabled = lang.disabled
+    outLanguageSelectionDict.title = lang.description;
+    outLanguageSelectionSelectEl.appendChild(outLanguageSelectionDict);
+  });
+  outLanguageSelectionSelectEl.addEventListener('select', e => {
+    e.preventDefault();
+    // console.log(e);
+  });
+
+
+  languageSelectionEl.appendChild(inLanguageSelectionLabelEl);
+  languageSelectionEl.appendChild(inLanguageSelectionSelectEl);
+  languageSelectionEl.appendChild(outLanguageSelectionLabelEl);
+  languageSelectionEl.appendChild(outLanguageSelectionSelectEl);
 
   headerEl.appendChild(languageSelectionEl);
 
