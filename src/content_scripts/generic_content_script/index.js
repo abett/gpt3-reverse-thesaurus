@@ -2,32 +2,52 @@ import browser from 'webextension-polyfill';
 import _ from 'lodash';
 import axios from 'axios';
 
+import 'img/animations/spinner-bubbles.svg';
 
+
+const languageSelectionDict = [
+  {label: 'EN', value: 'en', description: 'Find an English word', disabled: false},
+  {label: 'DE', value: 'de', description: 'Find a German word', disabled: false},
+  {label: 'FR', value: 'fr', description: 'Find a French word', disabled: true},
+  {label: 'ES', value: 'es', description: 'Find a Spanish word', disabled: true},
+];
+
+// use this to persist the position of the caret when the user calls up the overlay
 let targetAnchorPosition;
 
-const insertSuggestion = (suggestion) => {
+const handleSuggestionSelect = async (event) => {
+  // event.preventDefault();
+  const suggestion = event.currentTarget.dataset.suggestion;
+  if (!suggestion) return;
+
   const target = document.querySelector('.thesaurus-anchor');
-  if (!target) return;
 
-  console.log(`we will now try to insert ${suggestion}`);
-
-  try {
-    if (targetAnchorPosition) {
-      target.value = target.value.slice(0,targetAnchorPosition-1) + suggestion + target.value.slice(targetAnchorPosition+1);
-    } else {
+  if (target) {
+    try {
+      if (targetAnchorPosition) {
+        target.value = target.value.slice(0,targetAnchorPosition).replace(/\?\?\?$/, '') + suggestion + target.value.slice(targetAnchorPosition+1);
+      } else {
+        target.value += suggestion;
+      }
+    } catch(e) {
+      // console.log(e);
       target.value += suggestion;
     }
-  } catch(e) {
-    // console.log(e);
+    console.log(`inserted "${suggestion}" into ${target.tagName.toLowerCase()}`);
+  } else if (navigator.clipboard) {
+    await navigator.clipboard.writeText(suggestion)
+    .then(() => {
+      console.log(`copied "${suggestion}" to clipboard`);
+    })
+    .catch(e => {
+      console.log(e);
+    });
   }
 
-  hideThesaurusHelper();
-}
+  const helperInputEl = document.getElementById('thesaurus-explanation-input');
+  if (helperInputEl) helperInputEl.value = '';
 
-const handleSuggestionSelect = (event) => {
-  // event.preventDefault();
-  const suggestion = event.target.textContent;
-  if (suggestion) insertSuggestion(suggestion);
+  hideThesaurusHelper();
 }
 
 const handleSubmitClick = (event) => {
@@ -35,57 +55,122 @@ const handleSubmitClick = (event) => {
   getSuggestions();
 }
 
-const getSuggestions = () => {
+const getSuggestions = async () => {
   const helperInputEl = document.getElementById('thesaurus-explanation-input');
   if (!helperInputEl) return;
 
   const explanation = (helperInputEl.value || '').trim();
   if (explanation && explanation.length > 15) {
 
-    // prepare axios client headers
+    // first, disable the input, submit button and display a spinner
+    helperInputEl.disabled = true;
+
+    const submitButtonEl = document.getElementById('thesaurus-request-button');
+    submitButtonEl.disabled = true;
+
+    const resultArea = document.getElementById('thesaurus-suggestions');
+    resultArea.innerHTML = `<div class="loading-spinner"><img src="${browser.extension.getURL('spinner-bubbles.svg')}" /></div>`;
+
+
+    const apiKey = await browser.storage.local.get('apiKey')
+    .then(({apiKey}) => apiKey)
+    .catch(e => {
+      // console.log(e);
+      return process.env.API_TOKEN;
+    });
+
+    // prepare http agent
     const gtp3Api = axios.create({
       baseURL: 'https://1hpd1g.deta.dev/api/v1',
       headers: {
         'content-type' : 'application/json',
-        'Authorization': `Bearer ${process.env.API_TOKEN}`
+        'Authorization': `Bearer ${apiKey}`
       },
     });
 
-    gtp3Api.post(`/findwords/`, {
-      body: {
-        user_prompt: explanation,
-        input_language: 'en',
-        output_language: 'en',
-        tonality: 'friendly',
-        max_suggestions: 5,
+    const requestBody = {
+      user_prompt: explanation,
+      input_language: 'en',
+      output_language: 'en',
+      tonality: 'friendly',
+      max_suggestions: 5,
+    }
+
+    const languageSelectionSelectEl = document.getElementById('thesaurus-helper-language-select');
+    if (languageSelectionSelectEl && languageSelectionSelectEl.value) _.set(requestBody, 'output_language', languageSelectionSelectEl.value);
+
+
+    // TODO: activate real API below!
+    const returnDummyData = async () => {
+      return {
+        suggestions: {
+          "alien": "den Erfahrungen und Gefühlen anderer fremd sein, nicht zugehörig sein",
+          "outsider": "jemand, der nicht Teil einer Gruppe ist",
+          "loner": "jemand, der nicht gerne in Gruppen arbeitet oder sich mit anderen Menschen abgibt"
+        },
+        input_language: "en",
+        output_language: "en",
+        tonality: "friendly",
       }
-    })
+    };
+    returnDummyData()
+    /* TODO: UNCOMMENT HERE and remove returnDummyData above
+    // request word suggestions
+    gtp3Api.post(`/findwords/`, requestBody)
     .then(response => response.data)
+    */
     .then(data => {
-      console.log(data);
       if (!data) throw new Error('no-data');
 
-      const suggestions = _.get(data, 'suggestions', []);
-      if (!suggestions || suggestions.length === 0) throw new Error('no-suggestions');
+      // check whether we have an anchor to push this data to
+      const target = document.querySelector('.thesaurus-anchor');
 
-      // first, disable the submit button again
-      const submitButtonEl = document.getElementById('thesaurus-request-button');
-      submitButtonEl.disabled = true;
+      let suggestionDict = _.get(data, 'suggestions', {});
+      if (!suggestionDict || _.keys(suggestionDict).length === 0) throw new Error('no-suggestions');
 
-      // then clear result area
-      const resultArea = document.getElementById('thesaurus-suggestions');
+      // handle case of result being only a string array
+      if (_.isArray(suggestionDict)) {
+        suggestionDict = suggestionDict.reduce((a,b) => {a[b] = null; return a;}, {});
+      }
+
+      // clear result area, so we can render our results in
       resultArea.textContent = '';
 
-      const suggestionsList = document.createElement('ul');
+      const suggestionsList = document.createElement('div');
       suggestionsList.id = 'thesaurus-suggestion-list';
 
-      suggestions.forEach((suggestion, i) => {
-        const suggestionLiEl = document.createElement('li');
-        suggestionLiEl.classList.add(['thesaurus-suggestion']);
-        suggestionLiEl.textContent = suggestion;
-        suggestionLiEl.addEventListener('click', handleSuggestionSelect, false);
+      _.keys(suggestionDict).forEach((suggestion, i) => {
+        const suggestionEl = document.createElement('div');
+        suggestionEl.id = `thesaurus-suggestion-${i}`;
+        suggestionEl.dataset.suggestion = suggestion;
+        suggestionEl.classList.add(['thesaurus-suggestion']);
 
-        suggestionsList.appendChild(suggestionLiEl);
+        const suggestionCaptionEl = document.createElement('div');
+        suggestionCaptionEl.classList.add(['thesaurus-suggestion-caption']);
+        suggestionCaptionEl.textContent = suggestion;
+
+        const suggestionExplanationEl = document.createElement('div');
+        suggestionExplanationEl.classList.add(['thesaurus-suggestion-explanation']);
+        const suggestionExplanation = suggestionDict[suggestion];
+        if (suggestionExplanation) suggestionExplanationEl.textContent = suggestionExplanation;
+
+        const suggestionActionsEl = document.createElement('div');
+        if (target) {
+          suggestionActionsEl.classList.add(['thesaurus-suggestion-action-cta']);
+          suggestionActionsEl.dataset.action = 'insert';
+        } else if (navigator.clipboard) {
+          suggestionActionsEl.classList.add(['thesaurus-suggestion-action-cta']);
+          suggestionActionsEl.dataset.action = 'copy';
+        }
+
+
+        suggestionEl.appendChild(suggestionCaptionEl);
+        suggestionEl.appendChild(suggestionExplanationEl);
+        suggestionEl.appendChild(suggestionActionsEl);
+
+        suggestionEl.addEventListener('click', handleSuggestionSelect, false);
+
+        suggestionsList.appendChild(suggestionEl);
       });
 
       resultArea.appendChild(suggestionsList);
@@ -95,12 +180,15 @@ const getSuggestions = () => {
       console.log(e);
 
       // put a warning into the result area
-      const resultArea = document.getElementById('thesaurus-suggestions');
       if (e.message === 'no-suggestions') {
-        resultArea.textContent = "there haven't been any good suggestions :'(";
+        resultArea.textContent = '<div class="thesaurus-error">computer sagt nein</div>';
       } else {
-        resultArea.textContent = 'computer sagt nein.';
+        resultArea.innerHTML = '<div class="thesaurus-error">computer sagt nein</div>';
       }
+    })
+    .finally(() => {
+      submitButtonEl.disabled = false;
+      helperInputEl.disabled = false;
     })
   }
 }
@@ -112,29 +200,62 @@ const unlockButton = (event) => {
 
   if (helperInputEl.value.length > 15 && submitButtonEl.disabled) {
     submitButtonEl.disabled = false;
+  } else if (helperInputEl.value.length <= 15) {
+    submitButtonEl.disabled = true;
   }
 }
 
 const createThesaurusHelper = () => {
-
-  // create an overlay and position it at the input caret, if possible
+  // create an overlay
   const helperEl = document.createElement('div');
   helperEl.id = 'thesaurus-helper';
 
+  // create a header row
   const headerEl = document.createElement('div');
   headerEl.id = 'thesaurus-helper-header';
 
+  // create a selector for the language to suggest
+  const languageSelectionEl = document.createElement('div');
+  languageSelectionEl.id = 'thesaurus-helper-language-switch';
+
+  const languageSelectionLabelEl = document.createElement('label');
+  languageSelectionLabelEl.for = 'thesaurus-helper-language-select';
+  languageSelectionLabelEl.textContent = 'Language';
+  languageSelectionLabelEl.style.display = 'none';
+
+  const languageSelectionSelectEl = document.createElement('select');
+  languageSelectionSelectEl.id = 'thesaurus-helper-language-select';
+  languageSelectionSelectEl.name = 'thesaurus-helper-language';
+
+  languageSelectionDict.forEach(lang => {
+    const languageSelectionOptionEl = document.createElement('option');
+    languageSelectionOptionEl.value = lang.value;
+    languageSelectionOptionEl.textContent = lang.label;
+    languageSelectionOptionEl.disabled = lang.disabled
+    languageSelectionOptionEl.title = lang.description;
+    languageSelectionSelectEl.appendChild(languageSelectionOptionEl);
+  });
+  languageSelectionSelectEl.addEventListener('select', e => {
+    e.preventDefault();
+    // console.log(e);
+  });
+
+  languageSelectionEl.appendChild(languageSelectionLabelEl);
+  languageSelectionEl.appendChild(languageSelectionSelectEl);
+
+  headerEl.appendChild(languageSelectionEl);
+
+
   // create a small button to remove the overlay
-  const closeEl = document.createElement('a');
-  closeEl.id = 'close-thesaurus-helper';
-  closeEl.href = '#';
+  const closeEl = document.createElement('div');
+  closeEl.id = 'thesaurus-helper-close';
   closeEl.textContent = 'X';
   closeEl.addEventListener('click', hideThesaurusHelper, false);
 
   headerEl.appendChild(closeEl);
 
 
-
+  // create a main body
   const bodyEl = document.createElement('div');
   bodyEl.id = 'thesaurus-helper-body';
 
@@ -143,9 +264,9 @@ const createThesaurusHelper = () => {
   requestArea.classList.add(['request-wrapper']);
 
   const helperInputLabelEl = document.createElement('label');
-  helperInputLabelEl.for = 'thesaurus-explanation';
+  helperInputLabelEl.for = 'thesaurus-explanation-input';
   helperInputLabelEl.style.display = 'none';
-  helperInputLabelEl.innerHTML = 'thesaurus explanation';
+  helperInputLabelEl.textContent = 'thesaurus explanation';
 
   requestArea.appendChild(helperInputLabelEl);
 
@@ -155,15 +276,15 @@ const createThesaurusHelper = () => {
   helperInputEl.name = 'thesaurus-explanation';
   helperInputEl.placeholder = "explain the word you're looking for";
   helperInputEl.addEventListener('input', unlockButton, false);
-  helperInputEl.addEventListener('keyup', (e) => {
-    if (e.key === "Escape") hideThesaurusHelper();
-    if (e.key === "Enter") getSuggestions();
+  helperInputEl.addEventListener('keyup', event => {
+    if (event.key === "Escape") hideThesaurusHelper();
+    if (event.key === "Enter") getSuggestions();
   }, false);
 
   requestArea.appendChild(helperInputEl);
 
   const submitButtonEl = document.createElement('button');
-  submitButtonEl.type = 'submit';
+  submitButtonEl.type = 'button';
   submitButtonEl.id = 'thesaurus-request-button';
   submitButtonEl.innerHTML = 'GO';
   submitButtonEl.disabled = true;
@@ -177,12 +298,11 @@ const createThesaurusHelper = () => {
   resultArea.id = 'thesaurus-suggestions';
   resultArea.classList.add(['result-wrapper']);
 
-
   bodyEl.appendChild(requestArea);
   bodyEl.appendChild(resultArea);
 
 
-
+  // create a footer row
   const footerEl = document.createElement('div');
   footerEl.id = 'thesaurus-helper-footer';
   footerEl.innerHTML = "<div><p>Please enter a description of the word you're trying to find (>15 characters)</p></div>";
@@ -197,14 +317,8 @@ const createThesaurusHelper = () => {
 }
 
 const displayThesaurusHelper = () => {
-  try {
-    document.activeElement.classList.add(['thesaurus-anchor']);
-    targetAnchorPosition = document.activeElement.selectionEnd || null;
-  } catch(e) {
-    // console.log(e);
-  }
-
   const helperEl = document.getElementById('thesaurus-helper');
+
   if (helperEl) {
     helperEl.style.display = '';
     try {
@@ -220,8 +334,8 @@ const hideThesaurusHelper = () => {
   const helperEl = document.getElementById('thesaurus-helper');
   if (helperEl) helperEl.style.display = 'none';
 
-  const target = document.querySelector('.thesaurus-anchor');
-  if (target) target.classList.remove('thesaurus-anchor');
+  const anchors = document.querySelectorAll('.thesaurus-anchor');
+  [].forEach.call(anchors, (target) => target.classList.remove('thesaurus-anchor'));
 
   targetAnchorPosition = null;
 }
@@ -231,6 +345,11 @@ const toggleThesaurusHelper = () => {
   if (helperEl) {
     const isHidden = helperEl.style.display === 'none';
     if (isHidden) {
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        activeEl.classList.add(['thesaurus-anchor']);
+        targetAnchorPosition = activeEl.selectionEnd;
+      }
       displayThesaurusHelper();
     } else {
       hideThesaurusHelper();
@@ -251,20 +370,29 @@ const handleInputChange = (event) => {
   if (!event.target.value) return;
 
   if (event.data === '?') {
-    event.target.classList.add(['thesaurus-anchor']);
-    displayThesaurusHelper();
+    try {
+      const targetCaretPosition = event.target.selectionEnd || null;
+      const inputThreeQuestionMarks = /\?\?\?$/.test(event.target.value.slice(0,targetCaretPosition));
 
-  } else {
-    hideThesaurusHelper();
+      if (inputThreeQuestionMarks) {
+        event.target.classList.add(['thesaurus-anchor']);
+        targetAnchorPosition = targetCaretPosition;
+        displayThesaurusHelper();
+      }
+    } catch(e) {
+      // console.log(e);
+    }
   }
 }
 
 createThesaurusHelper();
 
 document.body.addEventListener('input', handleInputChange, false);
-// console.log('loaded!');
+
+document.body.addEventListener('keydown', (event) => {
+  if (event.key === "Escape") hideThesaurusHelper();
+}, false);
 
 browser.runtime.onMessage.addListener(request => {
-  console.log(request);
   if (request === 'toggle-thesaurus-helper') toggleThesaurusHelper();
 })

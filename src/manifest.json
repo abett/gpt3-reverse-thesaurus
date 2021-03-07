@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "GPT3 Test",
+  "name": "GPT3 Reverse Thesaurus",
   "options_page": "options.html",
   "background": {
     "page": "background.html"
@@ -23,7 +23,8 @@
     "activeTab", "storage"
   ],
   "web_accessible_resources": [
-    "content.styles.css"
+    "content.styles.css",
+    "spinner-bubbles.svg"
   ],
   "commands": {
     "toggle-thesaurus-helper": {
@@ -31,7 +32,7 @@
         "default": "Ctrl+Shift+U",
         "linux": "Ctrl+Shift+U"
       },
-      "description": "Open / Close the Reverse Thesaurus Helper"
+      "description": "Open / Close the Reverse Thesaurus Overlay"
     }
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"

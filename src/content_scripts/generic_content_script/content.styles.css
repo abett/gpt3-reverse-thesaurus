@@ -14,26 +14,66 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 10fr 1fr;
-}
-
-#thesaurus-helper > div {
-  margin: 20px;
-  padding: 20px;
+  font-family: sans-serif;
 }
 
 #thesaurus-helper-header {
   display: flex;
+  margin: 20px;
+  padding: 0 20px;
 }
 
-#thesaurus-helper-header a#close-thesaurus-helper {
-  margin-left: auto;
+#thesaurus-helper-language-switch {
+  align-self: center;
+  margin-right: auto;
   color: #f8c91c;
   font-size: x-large;
   font-weight: bold;
 }
 
+#thesaurus-helper-language-select {
+  background: #4c4c4c;
+  border: 2px solid #f8c91c;
+  border-radius: 4px;
+  color: #f8c91c;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#thesaurus-helper-language-select:after {
+  color: #f8c91c;
+}
+
+#thesaurus-helper-language-select > option {
+  background: #4c4c4c;
+  color: #f8c91c;
+}
+#thesaurus-helper-language-select > option:disabled {
+  background: #4c4c4c;
+  color: lightgray;
+}
+
+#thesaurus-helper-close {
+  cursor: pointer;
+  align-self: center;
+  margin-left: auto;
+  padding: 10px 18px;
+  color: #f8c91c;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#thesaurus-helper-close:hover {
+  background: #f8c91c;
+  color: #1e2330;
+}
+
+
+
 #thesaurus-helper-body {
   display: grid;
+  margin: 20px;
+  padding: 20px;
   grid-template-columns: 1fr;
   grid-template-rows: max-content;
 }
@@ -68,7 +108,7 @@
   background: none;
   border: none;
   color: #ffffff;
-  line-height:  24px;
+  line-height: 24px;
   box-shadow: none;
 }
 
@@ -94,36 +134,79 @@
   font-size: large;
   display: inline-block;
   line-height: 0;
+  cursor: pointer;
 }
 
-#thesaurus-helper-body #thesaurus-suggestions.result-wrapper {
+#thesaurus-helper-body .request-wrapper button:disabled {
+  cursor: default;
+  filter: grayscale(1);
+}
+
+#thesaurus-helper-body .result-wrapper {
   grid-row: 2;
   align-self: start;
   justify-self: center;
-  width: fit-content;
+  width: 90%;
 }
 
-#thesaurus-helper-body #thesaurus-suggestions.result-wrapper ul#thesaurus-suggestion-list {
-  margin: 0;
-  padding: 2px;
+#thesaurus-suggestions .loading-spinner,
+#thesaurus-suggestions .thesaurus-error {
+  justify-self: center;
+  text-align: center;
+  width: 100%;
+  min-height: 64px;
+}
+
+#thesaurus-suggestion-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(1fr);
   font-size: large;
 }
 
-#thesaurus-helper-body #thesaurus-suggestions.result-wrapper li.thesaurus-suggestion {
-  list-style-type: none; /* Remove bullets */
+#thesaurus-suggestion-list .thesaurus-suggestion {
   cursor: pointer;
-  margin: 2px;
-  padding: 2px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 9fr max-content;
+  grid-template-rows: repeat(1fr);
 }
 
-#thesaurus-helper-body #thesaurus-suggestions.result-wrapper li.thesaurus-suggestion:hover {
+#thesaurus-suggestion-list .thesaurus-suggestion:hover {
   background: #f8c91c;
   color: #1e2330;
 }
 
+#thesaurus-suggestion-list .thesaurus-suggestion .thesaurus-suggestion-caption {
+  padding: 5px 15px 5px 30px;
+  margin: 20px 0;
+  align-self: center;
+}
+
+#thesaurus-suggestion-list .thesaurus-suggestion .thesaurus-suggestion-explanation {
+  padding: 5px 15px;
+  margin: 20px 0;
+  align-self: center;
+}
+
+#thesaurus-suggestion-list .thesaurus-suggestion .thesaurus-suggestion-action-cta {
+  width: 80px;
+  align-self: center;
+  text-align: right;
+  padding: 5px 30px 5px 15px;
+  margin: 0;
+}
+
+#thesaurus-suggestion-list .thesaurus-suggestion:hover .thesaurus-suggestion-action-cta::after {
+  content: attr(data-action);
+}
+
+
 
 #thesaurus-helper-footer {
   display: none;
+  margin: 20px;
+  padding: 20px;
 }
 
 #thesaurus-helper-footer > div {

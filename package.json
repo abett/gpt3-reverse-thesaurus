@@ -1,6 +1,6 @@
 {
-  "name": "gpt-test",
-  "description": "GPT3 Test",
+  "name": "gpt3-reverse-thesaurus",
+  "description": "GPT3 Reverse Thesaurus",
   "version": "0.0.3",
   "private": true,
   "license": "UNLICENSED",
